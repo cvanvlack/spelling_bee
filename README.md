@@ -71,3 +71,19 @@ export default defineConfig([
   },
 ])
 ```
+
+## GitHub Pages
+
+The app is set up to deploy to GitHub Pages.
+
+1. **Enable Pages in the repo**
+   - Repo → **Settings** → **Pages**
+   - Under **Build and deployment**, set **Source** to **GitHub Actions**.
+
+2. **Push to `main`**
+   - The workflow in `.github/workflows/deploy-pages.yml` runs on every push to `main`, builds the app with the correct base path, and deploys to Pages.
+
+3. **Your site**
+   - It will be available at `https://<username>.github.io/<repo-name>/` (e.g. `https://colevanvlack.github.io/spelling_bee/`).
+
+The Vite `base` is set from the repo name in CI. For a different base (e.g. a custom domain at the root), set the `GITHUB_PAGES_BASE` env var when building (e.g. `GITHUB_PAGES_BASE=/ npm run build`).
