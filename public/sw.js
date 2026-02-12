@@ -2,13 +2,18 @@
 // Strategy: Cache-first for all assets
 
 const CACHE_NAME = "spelling-trainer-v1";
+
+// Derive base path from where the SW script is served
+// e.g. https://user.github.io/spelling_bee/sw.js → /spelling_bee/
+const BASE = new URL("./", self.location).pathname;
+
 const ASSETS_TO_CACHE = [
-  "/",
-  "/index.html",
-  "/data/wordlists.json",
-  "/manifest.webmanifest",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
+  BASE,
+  `${BASE}index.html`,
+  `${BASE}data/wordlists.json`,
+  `${BASE}manifest.webmanifest`,
+  `${BASE}icons/icon-192.png`,
+  `${BASE}icons/icon-512.png`,
 ];
 
 // Install: cache app shell and data
