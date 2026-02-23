@@ -4,6 +4,7 @@ import { speak } from "../../lib/tts";
 import { markAttempted, getAttemptedSet, getProgress, getSettings } from "../../lib/storage";
 import { buildQueue, nextWord } from "../../lib/shuffle";
 import type { WordQueue } from "../../lib/shuffle";
+import { getHomophoneInfo } from "../../lib/homophones";
 
 interface PracticeProps {
   level: Level;
@@ -56,6 +57,8 @@ export default function Practice({ level, onBack }: PracticeProps) {
     []
   );
 
+  const homophoneInfo = currentWord ? getHomophoneInfo(currentWord) : null;
+
   const handleSpeak = useCallback(() => {
     if (!currentWord) return;
     speak(currentWord, { rate: getRate(slowMode), voice: getVoice() });
@@ -64,6 +67,11 @@ export default function Practice({ level, onBack }: PracticeProps) {
   const handleRepeat = useCallback(() => {
     handleSpeak();
   }, [handleSpeak]);
+
+  const handleSentence = useCallback(() => {
+    if (!homophoneInfo) return;
+    speak(homophoneInfo.sentence, { rate: getRate(false), voice: getVoice() });
+  }, [homophoneInfo, getRate, getVoice]);
 
   const handleReveal = useCallback(() => {
     markAttempted(level.id, currentWord);
@@ -113,6 +121,14 @@ export default function Practice({ level, onBack }: PracticeProps) {
               >
                 🐢 Slow {slowMode ? "ON" : "OFF"}
               </button>
+              {homophoneInfo && (
+                <button className="btn btn-sentence" onClick={handleSentence}>
+                  📖 Use in a Sentence
+                  <span className="homophone-hint">
+                    Sounds like: {homophoneInfo.homophones.join(", ")}
+                  </span>
+                </button>
+              )}
             </div>
             <div className="practice-reveal">
               <button className="btn btn-reveal" onClick={handleReveal}>
@@ -123,6 +139,17 @@ export default function Practice({ level, onBack }: PracticeProps) {
         ) : (
           <div className="practice-revealed">
             <div className="revealed-word">{currentWord}</div>
+            {homophoneInfo && (
+              <div className="revealed-sentence">
+                <button className="btn btn-sentence-small" onClick={handleSentence}>
+                  📖 Hear in a sentence
+                </button>
+                <p className="sentence-text">"{homophoneInfo.sentence}"</p>
+                <p className="homophones-label">
+                  Sounds like: {homophoneInfo.homophones.join(", ")}
+                </p>
+              </div>
+            )}
             <button className="btn btn-primary btn-huge" onClick={handleNext}>
               Next →
             </button>
