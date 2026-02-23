@@ -348,10 +348,6 @@ register([
     ["fined", "He was fined for parking illegally."],
   ],
   [
-    ["ground", "The ball hit the ground and bounced."],
-    ["ground", "She ground the coffee beans fresh."],
-  ],
-  [
     ["guessed", "She guessed the correct answer."],
     ["guest", "The guest arrived early for the dinner party."],
   ],
@@ -605,10 +601,6 @@ register([
     ["reel", "He wound the fishing line back on the reel."],
   ],
   [
-    ["scene", "The crime scene was blocked off by police."],
-    ["seen", "Have you seen the latest movie?"],
-  ],
-  [
     ["sighed", "She sighed with relief after the exam."],
     ["side", "Please move to the other side of the room."],
   ],
@@ -642,15 +634,29 @@ register([
   ],
 ]);
 
-export interface HomophoneInfo {
-  homophones: string[];
+export interface SentenceInfo {
   sentence: string;
+  homophones: string[] | null;
 }
 
-export function getHomophoneInfo(word: string): HomophoneInfo | null {
+function spellOut(word: string): string {
+  return word
+    .split("")
+    .map((ch) => ch.toUpperCase())
+    .join(", ");
+}
+
+export function getSentenceInfo(word: string): SentenceInfo {
+  const entry = HOMOPHONE_MAP[word.toLowerCase()];
+  if (entry) {
+    return { sentence: entry.sentence, homophones: entry.homophones };
+  }
+  return {
+    sentence: `The word is: ${word}. ${spellOut(word)}. ${word}.`,
+    homophones: null,
+  };
+}
+
+export function getHomophoneInfo(word: string): { homophones: string[]; sentence: string } | null {
   return HOMOPHONE_MAP[word.toLowerCase()] ?? null;
-}
-
-export function hasHomophones(word: string): boolean {
-  return word.toLowerCase() in HOMOPHONE_MAP;
 }
