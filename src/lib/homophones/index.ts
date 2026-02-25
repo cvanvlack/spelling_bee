@@ -1,3 +1,5 @@
+import COMMON_SENTENCES from "../sentences/common";
+
 type HomophoneEntry = {
   homophones: string[];
   sentence: string;
@@ -219,10 +221,6 @@ register([
   [
     ["desert", "The desert is hot and dry during the day."],
     ["dessert", "We had chocolate cake for dessert."],
-  ],
-  [
-    ["flour", "You need flour to make bread."],
-    ["flower", "The flower bloomed in the spring."],
   ],
   [
     ["male", "The male bird has brighter feathers."],
@@ -639,24 +637,23 @@ export interface SentenceInfo {
   homophones: string[] | null;
 }
 
-function spellOut(word: string): string {
-  return word
-    .split("")
-    .map((ch) => ch.toUpperCase())
-    .join(", ");
-}
+/**
+ * Look up sentence info for a word.
+ * Returns a curated sentence if one exists (from homophones or general word list),
+ * plus any homophone data. Returns null if no sentence is available.
+ */
+export function getSentenceInfo(word: string): SentenceInfo | null {
+  const lower = word.toLowerCase();
 
-export function getSentenceInfo(word: string): SentenceInfo {
-  const entry = HOMOPHONE_MAP[word.toLowerCase()];
-  if (entry) {
-    return { sentence: entry.sentence, homophones: entry.homophones };
+  const homophone = HOMOPHONE_MAP[lower];
+  if (homophone) {
+    return { sentence: homophone.sentence, homophones: homophone.homophones };
   }
-  return {
-    sentence: `The word is: ${word}. ${spellOut(word)}. ${word}.`,
-    homophones: null,
-  };
-}
 
-export function getHomophoneInfo(word: string): { homophones: string[]; sentence: string } | null {
-  return HOMOPHONE_MAP[word.toLowerCase()] ?? null;
+  const sentence = COMMON_SENTENCES[lower] ?? COMMON_SENTENCES[word];
+  if (sentence) {
+    return { sentence, homophones: null };
+  }
+
+  return null;
 }

@@ -123,14 +123,16 @@ export default function Practice({ level, onBack }: PracticeProps) {
               >
                 🐢 Slow {slowMode ? "ON" : "OFF"}
               </button>
-              <button className="btn btn-sentence" onClick={handleSentence}>
-                📖 Use in a Sentence
-                {sentenceInfo?.homophones && (
-                  <span className="homophone-hint">
-                    Sounds like: {sentenceInfo.homophones.join(", ")}
-                  </span>
-                )}
-              </button>
+              {sentenceInfo && (
+                <button className="btn btn-sentence" onClick={handleSentence}>
+                  📖 Use in a Sentence
+                  {sentenceInfo.homophones && (
+                    <span className="homophone-hint">
+                      Sounds like: {sentenceInfo.homophones.join(", ")}
+                    </span>
+                  )}
+                </button>
+              )}
             </div>
             <div className="practice-reveal">
               <button className="btn btn-reveal" onClick={handleReveal}>
