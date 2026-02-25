@@ -1,4 +1,5 @@
 import COMMON_SENTENCES from "../sentences/common";
+import COMMON2_SENTENCES from "../sentences/common2";
 
 type HomophoneEntry = {
   homophones: string[];
@@ -650,7 +651,8 @@ export function getSentenceInfo(word: string): SentenceInfo | null {
     return { sentence: homophone.sentence, homophones: homophone.homophones };
   }
 
-  const sentence = COMMON_SENTENCES[lower] ?? COMMON_SENTENCES[word];
+  const sentence = COMMON_SENTENCES[lower] ?? COMMON_SENTENCES[word]
+    ?? COMMON2_SENTENCES[lower] ?? COMMON2_SENTENCES[word];
   if (sentence) {
     return { sentence, homophones: null };
   }
