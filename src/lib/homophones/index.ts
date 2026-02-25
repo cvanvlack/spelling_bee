@@ -2,6 +2,7 @@ import COMMON_SENTENCES from "../sentences/common";
 import COMMON2_SENTENCES from "../sentences/common2";
 import SCHOOL_SENTENCES from "../sentences/school";
 import ADVANCED_SENTENCES from "../sentences/advanced";
+import RARE_SENTENCES from "../sentences/rare";
 
 type HomophoneEntry = {
   homophones: string[];
@@ -656,7 +657,8 @@ export function getSentenceInfo(word: string): SentenceInfo | null {
   const sentence = COMMON_SENTENCES[lower] ?? COMMON_SENTENCES[word]
     ?? COMMON2_SENTENCES[lower] ?? COMMON2_SENTENCES[word]
     ?? SCHOOL_SENTENCES[lower] ?? SCHOOL_SENTENCES[word]
-    ?? ADVANCED_SENTENCES[lower] ?? ADVANCED_SENTENCES[word];
+    ?? ADVANCED_SENTENCES[lower] ?? ADVANCED_SENTENCES[word]
+    ?? RARE_SENTENCES[lower] ?? RARE_SENTENCES[word];
   if (sentence) {
     return { sentence, homophones: null };
   }
