@@ -1,5 +1,7 @@
 // Service Worker for Spelling Trainer PWA
-// Strategy: Cache-first for all assets
+// Strategy:
+// - Network-first for page navigations (avoids stale hashed asset references)
+// - Cache-first for static assets and local data
 
 const CACHE_NAME = "spelling-trainer-v1";
 
@@ -9,7 +11,6 @@ const BASE = new URL("./", self.location).pathname;
 
 const ASSETS_TO_CACHE = [
   BASE,
-  `${BASE}index.html`,
   `${BASE}data/wordlists.json`,
   `${BASE}manifest.webmanifest`,
   `${BASE}icons/icon-192.png`,
@@ -40,20 +41,52 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Fetch: cache-first strategy
+// Fetch:
+// - Navigations: network-first, fallback to cached app shell
+// - Other same-origin GETs: cache-first
 self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") {
+    return;
+  }
+
+  const url = new URL(event.request.url);
+  const isSameOrigin = url.origin === self.location.origin;
+
+  if (!isSameOrigin) {
+    return;
+  }
+
+  // Keep document requests fresh so they always point to current hashed assets.
+  const isNavigation =
+    event.request.mode === "navigate" ||
+    event.request.destination === "document" ||
+    url.pathname === BASE ||
+    url.pathname === `${BASE}index.html`;
+
+  if (isNavigation) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, clone);
+            });
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached ?? caches.match(BASE)))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) {
         return cached;
       }
       return fetch(event.request).then((response) => {
-        // Cache successful GET requests
-        if (
-          response.ok &&
-          event.request.method === "GET" &&
-          event.request.url.startsWith(self.location.origin)
-        ) {
+        if (response.ok) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, clone);
