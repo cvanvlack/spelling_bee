@@ -21,3 +21,7 @@ This is a **Spelling Trainer** PWA — a purely client-side Vite + React + TypeS
 - The `vite.config.ts` sets `base` to `/spelling_bee/` in production mode; in dev mode it defaults to `/`. No special env vars are needed for local development.
 - Word data lives in `public/data/wordlists.json` (static JSON, no API calls).
 - Progress is persisted in browser `localStorage`.
+
+### Word enrichment tool
+
+`scripts/enrich-words.mjs` adds child-friendly definitions and example sentences to `public/data/wordlists.json`. See `scripts/README.md` for full usage. Requires `OPENAI_API_KEY` env var for the OpenAI phase; dictionary-only mode (`--dictionary-only`) works without it.
