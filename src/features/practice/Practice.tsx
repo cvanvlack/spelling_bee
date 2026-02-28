@@ -1,9 +1,10 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import type { Level } from "../../types";
 import { speak } from "../../lib/tts";
 import { markAttempted, getAttemptedSet, getProgress, getSettings } from "../../lib/storage";
 import { buildQueue, nextWord } from "../../lib/shuffle";
 import type { WordQueue } from "../../lib/shuffle";
+import { getSentenceInfo } from "../../lib/homophones";
 
 interface PracticeProps {
   level: Level;
@@ -34,7 +35,6 @@ export default function Practice({ level, onBack }: PracticeProps) {
     refreshProgress();
   }, [level.id, refreshProgress]);
 
-  // Initialize
   useEffect(() => {
     advanceToNext();
   }, [advanceToNext]);
@@ -56,6 +56,11 @@ export default function Practice({ level, onBack }: PracticeProps) {
     []
   );
 
+  const sentenceInfo = useMemo(
+    () => (currentWord ? getSentenceInfo(currentWord) : null),
+    [currentWord]
+  );
+
   const handleSpeak = useCallback(() => {
     if (!currentWord) return;
     speak(currentWord, { rate: getRate(slowMode), voice: getVoice() });
@@ -64,6 +69,11 @@ export default function Practice({ level, onBack }: PracticeProps) {
   const handleRepeat = useCallback(() => {
     handleSpeak();
   }, [handleSpeak]);
+
+  const handleSentence = useCallback(() => {
+    if (!sentenceInfo) return;
+    speak(sentenceInfo.sentence, { rate: getRate(false), voice: getVoice() });
+  }, [sentenceInfo, getRate, getVoice]);
 
   const handleReveal = useCallback(() => {
     markAttempted(level.id, currentWord);
@@ -113,6 +123,16 @@ export default function Practice({ level, onBack }: PracticeProps) {
               >
                 🐢 Slow {slowMode ? "ON" : "OFF"}
               </button>
+              {sentenceInfo && (
+                <button className="btn btn-sentence" onClick={handleSentence}>
+                  📖 Use in a Sentence
+                  {sentenceInfo.homophones && (
+                    <span className="homophone-hint">
+                      Sounds like: {sentenceInfo.homophones.join(", ")}
+                    </span>
+                  )}
+                </button>
+              )}
             </div>
             <div className="practice-reveal">
               <button className="btn btn-reveal" onClick={handleReveal}>
@@ -123,6 +143,19 @@ export default function Practice({ level, onBack }: PracticeProps) {
         ) : (
           <div className="practice-revealed">
             <div className="revealed-word">{currentWord}</div>
+            {sentenceInfo && (
+              <div className="revealed-sentence">
+                <button className="btn btn-sentence-small" onClick={handleSentence}>
+                  📖 Hear in a sentence
+                </button>
+                <p className="sentence-text">"{sentenceInfo.sentence}"</p>
+                {sentenceInfo.homophones && (
+                  <p className="homophones-label">
+                    Sounds like: {sentenceInfo.homophones.join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
             <button className="btn btn-primary btn-huge" onClick={handleNext}>
               Next →
             </button>

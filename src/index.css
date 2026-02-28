@@ -156,6 +156,68 @@ body {
   background: var(--color-reveal-hover);
 }
 
+.btn-sentence {
+  padding: 16px 28px;
+  font-size: 1.1rem;
+  width: 100%;
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  color: white;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-sentence:hover {
+  background: linear-gradient(135deg, #6d28d9, #5b21b6);
+  box-shadow: var(--shadow-lg);
+}
+
+.homophone-hint {
+  font-size: 0.8rem;
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+.btn-sentence-small {
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+.btn-sentence-small:hover {
+  background: linear-gradient(135deg, #6d28d9, #5b21b6);
+}
+
+.revealed-sentence {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  background: #f5f3ff;
+  border-radius: var(--radius);
+  border: 1px solid #e9e5f5;
+  width: 100%;
+}
+
+.sentence-text {
+  font-size: 1rem;
+  color: var(--color-text);
+  text-align: center;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.homophones-label {
+  font-size: 0.8rem;
+  color: var(--color-text-light);
+  text-align: center;
+}
+
 /* Home Screen */
 .home {
   align-items: center;
