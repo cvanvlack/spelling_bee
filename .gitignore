@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Enrichment script cache
+scripts/.enrichment-cache.json
