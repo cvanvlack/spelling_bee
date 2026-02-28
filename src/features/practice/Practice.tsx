@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback, useRef } from "react";
-import type { Level } from "../../types";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import type { Level, Word } from "../../types";
 import { speak } from "../../lib/tts";
 import { markAttempted, getAttemptedSet, getProgress, getSettings } from "../../lib/storage";
 import { buildQueue, nextWord } from "../../lib/shuffle";
@@ -11,32 +11,37 @@ interface PracticeProps {
 }
 
 export default function Practice({ level, onBack }: PracticeProps) {
-  const allWords = useRef(level.words.map((w) => w.text));
-  const [currentWord, setCurrentWord] = useState("");
-  const [revealed, setRevealed] = useState(false);
-  const [slowMode, setSlowMode] = useState(false);
-  const [progress, setProgress] = useState({ attempted: 0, total: 0, percentage: 0 });
+  const allWords = useMemo(() => level.words.map((w) => w.text), [level.words]);
+  const wordsByText = useMemo(() => new Map(level.words.map((word) => [word.text, word])), [level.words]);
   const queueRef = useRef<WordQueue | null>(null);
+  const [currentWord, setCurrentWord] = useState<Word | null>(null);
+  const [revealed, setRevealed] = useState(false);
+  const [showDefinition, setShowDefinition] = useState(false);
+  const [slowMode, setSlowMode] = useState(false);
+  const [progress, setProgress] = useState(() => getProgress(level.id, allWords.length));
 
   const refreshProgress = useCallback(() => {
-    setProgress(getProgress(level.id, allWords.current.length));
-  }, [level.id]);
+    setProgress(getProgress(level.id, allWords.length));
+  }, [level.id, allWords.length]);
 
   const advanceToNext = useCallback(() => {
     const attempted = getAttemptedSet(level.id);
     if (!queueRef.current) {
-      queueRef.current = buildQueue(allWords.current, attempted);
+      queueRef.current = buildQueue(allWords, attempted);
     }
-    const { word, updatedQueue } = nextWord(queueRef.current, allWords.current, attempted);
+    const { word, updatedQueue } = nextWord(queueRef.current, allWords, attempted);
     queueRef.current = updatedQueue;
-    setCurrentWord(word);
+    setCurrentWord(wordsByText.get(word) ?? { text: word });
     setRevealed(false);
+    setShowDefinition(false);
     refreshProgress();
-  }, [level.id, refreshProgress]);
+  }, [level.id, allWords, wordsByText, refreshProgress]);
 
-  // Initialize
   useEffect(() => {
-    advanceToNext();
+    const timer = window.setTimeout(() => {
+      advanceToNext();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [advanceToNext]);
 
   const getVoice = useCallback((): SpeechSynthesisVoice | null => {
@@ -57,8 +62,13 @@ export default function Practice({ level, onBack }: PracticeProps) {
   );
 
   const handleSpeak = useCallback(() => {
-    if (!currentWord) return;
-    speak(currentWord, { rate: getRate(slowMode), voice: getVoice() });
+    if (!currentWord?.text) return;
+    speak(currentWord.text, { rate: getRate(slowMode), voice: getVoice() });
+  }, [currentWord, slowMode, getRate, getVoice]);
+
+  const handleReadSentence = useCallback(() => {
+    if (!currentWord?.sentence) return;
+    speak(currentWord.sentence, { rate: getRate(slowMode), voice: getVoice() });
   }, [currentWord, slowMode, getRate, getVoice]);
 
   const handleRepeat = useCallback(() => {
@@ -66,8 +76,10 @@ export default function Practice({ level, onBack }: PracticeProps) {
   }, [handleSpeak]);
 
   const handleReveal = useCallback(() => {
-    markAttempted(level.id, currentWord);
+    if (!currentWord?.text) return;
+    markAttempted(level.id, currentWord.text);
     setRevealed(true);
+    setShowDefinition(false);
     refreshProgress();
   }, [level.id, currentWord, refreshProgress]);
 
@@ -104,6 +116,11 @@ export default function Practice({ level, onBack }: PracticeProps) {
               <button className="btn btn-primary btn-huge" onClick={handleSpeak}>
                 🔊 Speak
               </button>
+              {currentWord?.sentence ? (
+                <button className="btn btn-primary btn-large" onClick={handleReadSentence}>
+                  📖 Read sentence
+                </button>
+              ) : null}
               <button className="btn btn-primary btn-large" onClick={handleRepeat}>
                 🔁 Repeat
               </button>
@@ -122,7 +139,19 @@ export default function Practice({ level, onBack }: PracticeProps) {
           </>
         ) : (
           <div className="practice-revealed">
-            <div className="revealed-word">{currentWord}</div>
+            <div className="revealed-word">{currentWord?.text}</div>
+            {currentWord?.definition ? (
+              <>
+                <button className="btn btn-secondary btn-large" onClick={() => setShowDefinition((show) => !show)}>
+                  {showDefinition ? "Hide definition" : "Show definition"}
+                </button>
+                {showDefinition ? (
+                  <div className="definition-card">
+                    <p className="definition-text">{currentWord.definition}</p>
+                  </div>
+                ) : null}
+              </>
+            ) : null}
             <button className="btn btn-primary btn-huge" onClick={handleNext}>
               Next →
             </button>

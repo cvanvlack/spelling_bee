@@ -1,5 +1,6 @@
 export interface Word {
   text: string;
+  definition?: string;
   syllables?: string;
   hint?: string;
   sentence?: string;
