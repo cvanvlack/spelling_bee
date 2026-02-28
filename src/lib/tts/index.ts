@@ -1,52 +1,73 @@
-// Text-to-Speech wrapper using window.speechSynthesis
-// Works offline using system voices
+import { kokoroTtsAdapter } from "./kokoro";
+import { nativeTtsAdapter } from "./native";
+import { piperTtsAdapter } from "./piper";
+import type { SpeakOptions, TtsEngineAdapter, TtsEngineId, TtsVoiceOption } from "./types";
 
-let currentUtterance: SpeechSynthesisUtterance | null = null;
+export type { TtsEngineId, TtsVoiceOption } from "./types";
 
-export function getVoices(): SpeechSynthesisVoice[] {
-  return window.speechSynthesis.getVoices().filter((v) => v.lang.startsWith("en"));
+const adapters: Record<TtsEngineId, TtsEngineAdapter> = {
+  native: nativeTtsAdapter,
+  piper: piperTtsAdapter,
+  kokoro: kokoroTtsAdapter,
+};
+
+export interface SpeakWithEngineOptions extends SpeakOptions {
+  preferredEngine: TtsEngineId;
+  fallbackToNative?: boolean;
 }
 
-export function loadVoices(): Promise<SpeechSynthesisVoice[]> {
-  return new Promise((resolve) => {
-    const voices = getVoices();
-    if (voices.length > 0) {
-      resolve(voices);
-      return;
-    }
-    window.speechSynthesis.onvoiceschanged = () => {
-      resolve(getVoices());
-    };
-    // Fallback timeout
-    setTimeout(() => resolve(getVoices()), 1000);
-  });
+export interface SpeakResult {
+  engineUsed: TtsEngineId;
+  fallbackReason: string | null;
 }
 
-export function speak(
-  word: string,
-  options: {
-    rate?: number;
-    voice?: SpeechSynthesisVoice | null;
-  } = {}
-): void {
-  cancel();
-  const utterance = new SpeechSynthesisUtterance(word);
-  utterance.rate = options.rate ?? 1.0;
-  utterance.lang = "en-US";
-  if (options.voice) {
-    utterance.voice = options.voice;
+function resolveEngine(preferred: TtsEngineId): TtsEngineAdapter {
+  const adapter = adapters[preferred];
+  if (adapter.isAvailable()) {
+    return adapter;
   }
-  currentUtterance = utterance;
-  window.speechSynthesis.speak(utterance);
+  return nativeTtsAdapter;
+}
+
+export async function listVoices(engine: TtsEngineId): Promise<TtsVoiceOption[]> {
+  const adapter = resolveEngine(engine);
+  return adapter.listVoices();
+}
+
+export function getAvailableEngines(): Array<{ id: TtsEngineId; label: string; available: boolean }> {
+  return [
+    { id: "native", label: "Native Browser", available: adapters.native.isAvailable() },
+    { id: "piper", label: "Piper (Local Model)", available: adapters.piper.isAvailable() },
+    { id: "kokoro", label: "Kokoro (Local Model)", available: adapters.kokoro.isAvailable() },
+  ];
+}
+
+export async function speak(text: string, options: SpeakWithEngineOptions): Promise<SpeakResult> {
+  const preferredAdapter = resolveEngine(options.preferredEngine);
+
+  try {
+    cancel();
+    await preferredAdapter.speak(text, options);
+    return { engineUsed: preferredAdapter.id, fallbackReason: null };
+  } catch (error) {
+    if (options.fallbackToNative === false || preferredAdapter.id === "native") {
+      throw error;
+    }
+    cancel();
+    await nativeTtsAdapter.speak(text, options);
+    return {
+      engineUsed: "native",
+      fallbackReason: `${preferredAdapter.id} engine unavailable, using native voice`,
+    };
+  }
 }
 
 export function cancel(): void {
-  window.speechSynthesis.cancel();
-  currentUtterance = null;
+  nativeTtsAdapter.cancel();
+  piperTtsAdapter.cancel();
+  kokoroTtsAdapter.cancel();
 }
 
-export function isSpeaking(): boolean {
-  return window.speechSynthesis.speaking;
+export function isSpeaking(engine: TtsEngineId): boolean {
+  return resolveEngine(engine).isSpeaking();
 }
-
-export { currentUtterance };

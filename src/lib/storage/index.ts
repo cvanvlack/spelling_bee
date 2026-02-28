@@ -1,16 +1,23 @@
 // LocalStorage-based progress and settings persistence
+import type { TtsEngineId } from "../tts/types";
 
 const ATTEMPTED_PREFIX = "spelling_attempted_";
 const SETTINGS_KEY = "spelling_settings";
 
 export interface Settings {
-  voiceURI: string | null;
+  ttsEngine: TtsEngineId;
+  nativeVoiceURI: string | null;
+  piperVoiceId: string | null;
+  kokoroVoiceId: string | null;
   normalRate: number;
   slowRate: number;
 }
 
 const DEFAULT_SETTINGS: Settings = {
-  voiceURI: null,
+  ttsEngine: "kokoro",
+  nativeVoiceURI: null,
+  piperVoiceId: "en_US-hfc_female-medium",
+  kokoroVoiceId: "af_bella",
   normalRate: 1.0,
   slowRate: 0.7,
 };
@@ -54,7 +61,9 @@ export function getSettings(): Settings {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
     if (!raw) return { ...DEFAULT_SETTINGS };
-    return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw) as Partial<Settings> & { voiceURI?: string | null };
+    const migratedVoice = parsed.nativeVoiceURI ?? parsed.voiceURI ?? null;
+    return { ...DEFAULT_SETTINGS, ...parsed, nativeVoiceURI: migratedVoice };
   } catch {
     return { ...DEFAULT_SETTINGS };
   }

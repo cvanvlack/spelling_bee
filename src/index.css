@@ -431,6 +431,12 @@ body {
   box-shadow: var(--shadow);
 }
 
+.settings-help {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   .app-title {

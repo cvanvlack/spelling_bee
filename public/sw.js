@@ -15,6 +15,16 @@ const ASSETS_TO_CACHE = [
   `${BASE}manifest.webmanifest`,
   `${BASE}icons/icon-192.png`,
   `${BASE}icons/icon-512.png`,
+  `${BASE}tts/manifest.json`,
+  `${BASE}tts/README.md`,
+  `${BASE}tts/onnx/README.md`,
+  `${BASE}tts/piper/runtime/piper_phonemize.wasm`,
+  `${BASE}tts/piper/runtime/piper_phonemize.data`,
+  `${BASE}tts/piper/models/en_US-hfc_female-medium.onnx`,
+  `${BASE}tts/piper/models/en_US-hfc_female-medium.onnx.json`,
+  `${BASE}tts/piper/models/en_US-lessac-high.onnx`,
+  `${BASE}tts/piper/models/en_US-lessac-high.onnx.json`,
+  `${BASE}tts/kokoro/models/onnx-community/Kokoro-82M-v1.0-ONNX/README.md`,
 ];
 
 // Install: cache app shell and data

@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "engines": {
+    "piper": {
+      "runtime": [
+        "/tts/piper/runtime/piper_phonemize.wasm",
+        "/tts/piper/runtime/piper_phonemize.data"
+      ],
+      "voices": [
+        {
+          "id": "en_US-hfc_female-medium",
+          "model": "/tts/piper/models/en_US-hfc_female-medium.onnx",
+          "config": "/tts/piper/models/en_US-hfc_female-medium.onnx.json"
+        },
+        {
+          "id": "en_US-lessac-high",
+          "model": "/tts/piper/models/en_US-lessac-high.onnx",
+          "config": "/tts/piper/models/en_US-lessac-high.onnx.json"
+        }
+      ]
+    },
+    "kokoro": {
+      "modelRoot": "/tts/kokoro/models/onnx-community/Kokoro-82M-v1.0-ONNX/"
+    }
+  }
+}

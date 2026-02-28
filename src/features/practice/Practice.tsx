@@ -44,13 +44,11 @@ export default function Practice({ level, onBack }: PracticeProps) {
     return () => window.clearTimeout(timer);
   }, [advanceToNext]);
 
-  const getVoice = useCallback((): SpeechSynthesisVoice | null => {
+  const getVoiceId = useCallback((): string | null => {
     const settings = getSettings();
-    if (settings.voiceURI) {
-      const voices = window.speechSynthesis.getVoices();
-      return voices.find((v) => v.voiceURI === settings.voiceURI) || null;
-    }
-    return null;
+    if (settings.ttsEngine === "native") return settings.nativeVoiceURI;
+    if (settings.ttsEngine === "piper") return settings.piperVoiceId;
+    return settings.kokoroVoiceId;
   }, []);
 
   const getRate = useCallback(
@@ -61,18 +59,36 @@ export default function Practice({ level, onBack }: PracticeProps) {
     []
   );
 
-  const handleSpeak = useCallback(() => {
+  const handleSpeak = useCallback(async () => {
     if (!currentWord?.text) return;
-    speak(currentWord.text, { rate: getRate(slowMode), voice: getVoice() });
-  }, [currentWord, slowMode, getRate, getVoice]);
+    const settings = getSettings();
+    try {
+      await speak(currentWord.text, {
+        preferredEngine: settings.ttsEngine,
+        rate: getRate(slowMode),
+        voiceId: getVoiceId(),
+      });
+    } catch (error) {
+      console.error("TTS failed:", error);
+    }
+  }, [currentWord, slowMode, getRate, getVoiceId]);
 
-  const handleReadSentence = useCallback(() => {
+  const handleReadSentence = useCallback(async () => {
     if (!currentWord?.sentence) return;
-    speak(currentWord.sentence, { rate: getRate(slowMode), voice: getVoice() });
-  }, [currentWord, slowMode, getRate, getVoice]);
+    const settings = getSettings();
+    try {
+      await speak(currentWord.sentence, {
+        preferredEngine: settings.ttsEngine,
+        rate: getRate(slowMode),
+        voiceId: getVoiceId(),
+      });
+    } catch (error) {
+      console.error("TTS sentence playback failed:", error);
+    }
+  }, [currentWord, slowMode, getRate, getVoiceId]);
 
   const handleRepeat = useCallback(() => {
-    handleSpeak();
+    void handleSpeak();
   }, [handleSpeak]);
 
   const handleReveal = useCallback(() => {
@@ -113,15 +129,15 @@ export default function Practice({ level, onBack }: PracticeProps) {
         {!revealed ? (
           <>
             <div className="practice-controls">
-              <button className="btn btn-primary btn-huge" onClick={handleSpeak}>
+              <button className="btn btn-primary btn-huge" onClick={() => void handleSpeak()}>
                 🔊 Speak
               </button>
               {currentWord?.sentence ? (
-                <button className="btn btn-primary btn-large" onClick={handleReadSentence}>
+                <button className="btn btn-primary btn-large" onClick={() => void handleReadSentence()}>
                   📖 Read sentence
                 </button>
               ) : null}
-              <button className="btn btn-primary btn-large" onClick={handleRepeat}>
+              <button className="btn btn-primary btn-large" onClick={() => void handleRepeat()}>
                 🔁 Repeat
               </button>
               <button
