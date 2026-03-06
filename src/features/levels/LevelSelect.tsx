@@ -55,7 +55,8 @@ export default function LevelSelect({ onSelectLevel, onBack }: LevelSelectProps)
                   />
                 </div>
                 <span className="progress-text">
-                  {progress.percentage}% ({progress.attempted} / {progress.total} words)
+                  {progress.percentage}% mastered ({progress.correct} / {progress.total} words)
+                  {progress.incorrect > 0 ? ` • ${progress.incorrect} to review` : ""}
                 </span>
               </div>
             </button>

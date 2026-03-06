@@ -1,8 +1,12 @@
 // LocalStorage-based progress and settings persistence
 import type { TtsEngineId } from "../tts/types";
 
-const ATTEMPTED_PREFIX = "spelling_attempted_";
+const LEGACY_ATTEMPTED_PREFIX = "spelling_attempted_";
+const RESULTS_PREFIX = "spelling_results_";
 const SETTINGS_KEY = "spelling_settings";
+
+export type WordResult = "correct" | "incorrect";
+export type WordResults = Record<string, WordResult>;
 
 export interface Settings {
   ttsEngine: TtsEngineId;
@@ -24,13 +28,17 @@ const DEFAULT_SETTINGS: Settings = {
 
 // --- Progress ---
 
-function getAttemptedKey(levelId: string): string {
-  return `${ATTEMPTED_PREFIX}${levelId}`;
+function getLegacyAttemptedKey(levelId: string): string {
+  return `${LEGACY_ATTEMPTED_PREFIX}${levelId}`;
 }
 
-export function getAttemptedSet(levelId: string): Set<string> {
+function getResultsKey(levelId: string): string {
+  return `${RESULTS_PREFIX}${levelId}`;
+}
+
+function getLegacyAttemptedSet(levelId: string): Set<string> {
   try {
-    const raw = localStorage.getItem(getAttemptedKey(levelId));
+    const raw = localStorage.getItem(getLegacyAttemptedKey(levelId));
     if (!raw) return new Set();
     const arr: string[] = JSON.parse(raw);
     return new Set(arr);
@@ -39,20 +47,68 @@ export function getAttemptedSet(levelId: string): Set<string> {
   }
 }
 
-export function markAttempted(levelId: string, word: string): void {
-  const set = getAttemptedSet(levelId);
-  set.add(word);
-  localStorage.setItem(getAttemptedKey(levelId), JSON.stringify([...set]));
+function saveWordResults(levelId: string, results: WordResults): void {
+  localStorage.setItem(getResultsKey(levelId), JSON.stringify(results));
+}
+
+export function getWordResults(levelId: string): WordResults {
+  let parsedResults: WordResults = {};
+
+  try {
+    const raw = localStorage.getItem(getResultsKey(levelId));
+    if (raw) {
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      parsedResults = Object.fromEntries(
+        Object.entries(parsed).filter(
+          (entry): entry is [string, WordResult] =>
+            entry[1] === "correct" || entry[1] === "incorrect"
+        )
+      );
+    }
+  } catch {
+    parsedResults = {};
+  }
+
+  const legacyAttempted = getLegacyAttemptedSet(levelId);
+  let migrated = false;
+
+  for (const word of legacyAttempted) {
+    if (!parsedResults[word]) {
+      parsedResults[word] = "correct";
+      migrated = true;
+    }
+  }
+
+  if (migrated) {
+    saveWordResults(levelId, parsedResults);
+  }
+
+  return parsedResults;
+}
+
+export function markWordResult(levelId: string, word: string, result: WordResult): void {
+  const results = getWordResults(levelId);
+  results[word] = result;
+  saveWordResults(levelId, results);
 }
 
 export function getProgress(
   levelId: string,
   totalWords: number
-): { attempted: number; total: number; percentage: number } {
-  const set = getAttemptedSet(levelId);
-  const attempted = set.size;
-  const percentage = totalWords > 0 ? Math.round((attempted / totalWords) * 100) : 0;
-  return { attempted, total: totalWords, percentage };
+): { correct: number; incorrect: number; total: number; percentage: number } {
+  const results = getWordResults(levelId);
+  const values = Object.values(results);
+  const correct = values.filter((value) => value === "correct").length;
+  const incorrect = values.filter((value) => value === "incorrect").length;
+  const percentage =
+    totalWords === 0
+      ? 0
+      : correct === 0
+        ? 0
+        : correct === totalWords
+          ? 100
+          : Math.max(1, Math.round((correct / totalWords) * 100));
+  return { correct, incorrect, total: totalWords, percentage };
 }
 
 // --- Settings ---
