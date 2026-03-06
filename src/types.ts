@@ -17,4 +17,24 @@ export interface WordListData {
   levels: Level[];
 }
 
-export type Screen = "home" | "levels" | "practice" | "settings";
+export type Screen =
+  | "home"
+  | "levels"
+  | "practice"
+  | "settings"
+  | "math-categories"
+  | "math-multiplication"
+  | "math-practice";
+
+export type DigitCount = 1 | 2 | 3;
+
+export interface MultiplicationSelection {
+  leftDigits: DigitCount;
+  rightDigits: DigitCount;
+}
+
+export interface MultiplicationProblem extends MultiplicationSelection {
+  left: number;
+  right: number;
+  answer: number;
+}
