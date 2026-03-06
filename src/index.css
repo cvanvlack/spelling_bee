@@ -272,6 +272,32 @@ body {
   gap: 6px;
 }
 
+.math-card-description {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--color-text-light);
+}
+
+.math-option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  flex: 1;
+}
+
+.math-option-card,
+.math-category-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.math-option-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
 .progress-bar {
   height: 8px;
   background: var(--color-progress-bg);
@@ -326,6 +352,12 @@ body {
   gap: 4px;
 }
 
+.practice-subtitle {
+  font-size: 0.95rem;
+  color: var(--color-text-light);
+  margin-bottom: 6px;
+}
+
 .progress-bar-small {
   height: 6px;
 }
@@ -369,6 +401,37 @@ body {
   text-align: center;
   word-break: break-word;
   line-height: 1.2;
+}
+
+.math-problem-card {
+  width: 100%;
+  background: var(--color-surface);
+  border: 2px solid var(--color-progress-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.math-problem-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 18px;
+}
+
+.math-problem {
+  font-size: 3.25rem;
+}
+
+.math-problem-summary {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-light);
+  text-align: center;
 }
 
 .definition-card {
@@ -480,8 +543,16 @@ body {
     font-size: 2rem;
   }
 
+  .math-option-grid {
+    grid-template-columns: 1fr;
+  }
+
   .revealed-word {
     font-size: 2.5rem;
+  }
+
+  .math-problem {
+    font-size: 2.6rem;
   }
 
   .definition-text {
