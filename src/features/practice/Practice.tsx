@@ -1,7 +1,13 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import type { Level, Word } from "../../types";
 import { speak } from "../../lib/tts";
-import { markAttempted, getAttemptedSet, getProgress, getSettings } from "../../lib/storage";
+import {
+  getProgress,
+  getSettings,
+  getWordResults,
+  markWordResult,
+  type WordResult,
+} from "../../lib/storage";
 import { buildQueue, nextWord } from "../../lib/shuffle";
 import type { WordQueue } from "../../lib/shuffle";
 
@@ -25,11 +31,11 @@ export default function Practice({ level, onBack }: PracticeProps) {
   }, [level.id, allWords.length]);
 
   const advanceToNext = useCallback(() => {
-    const attempted = getAttemptedSet(level.id);
+    const results = getWordResults(level.id);
     if (!queueRef.current) {
-      queueRef.current = buildQueue(allWords, attempted);
+      queueRef.current = buildQueue(allWords, results);
     }
-    const { word, updatedQueue } = nextWord(queueRef.current, allWords, attempted);
+    const { word, updatedQueue } = nextWord(queueRef.current, allWords, results);
     queueRef.current = updatedQueue;
     setCurrentWord(wordsByText.get(word) ?? { text: word });
     setRevealed(false);
@@ -93,15 +99,15 @@ export default function Practice({ level, onBack }: PracticeProps) {
 
   const handleReveal = useCallback(() => {
     if (!currentWord?.text) return;
-    markAttempted(level.id, currentWord.text);
     setRevealed(true);
     setShowDefinition(false);
-    refreshProgress();
-  }, [level.id, currentWord, refreshProgress]);
+  }, [currentWord]);
 
-  const handleNext = useCallback(() => {
+  const handleRecordResult = useCallback((result: WordResult) => {
+    if (!currentWord?.text) return;
+    markWordResult(level.id, currentWord.text, result);
     advanceToNext();
-  }, [advanceToNext]);
+  }, [level.id, currentWord, advanceToNext]);
 
   return (
     <div className="screen practice">
@@ -119,7 +125,8 @@ export default function Practice({ level, onBack }: PracticeProps) {
               />
             </div>
             <span className="progress-text-small">
-              {progress.percentage}% ({progress.attempted}/{progress.total})
+              {progress.percentage}% mastered ({progress.correct}/{progress.total})
+              {progress.incorrect > 0 ? ` • ${progress.incorrect} to review` : ""}
             </span>
           </div>
         </div>
@@ -158,7 +165,10 @@ export default function Practice({ level, onBack }: PracticeProps) {
             <div className="revealed-word">{currentWord?.text}</div>
             {currentWord?.definition ? (
               <>
-                <button className="btn btn-secondary btn-large" onClick={() => setShowDefinition((show) => !show)}>
+                <button
+                  className="btn btn-secondary btn-large"
+                  onClick={() => setShowDefinition((show) => !show)}
+                >
                   {showDefinition ? "Hide definition" : "Show definition"}
                 </button>
                 {showDefinition ? (
@@ -168,9 +178,15 @@ export default function Practice({ level, onBack }: PracticeProps) {
                 ) : null}
               </>
             ) : null}
-            <button className="btn btn-primary btn-huge" onClick={handleNext}>
-              Next →
-            </button>
+            <div className="outcome-prompt">How did you do?</div>
+            <div className="outcome-actions">
+              <button className="btn btn-success btn-large" onClick={() => handleRecordResult("correct")}>
+                I got it right →
+              </button>
+              <button className="btn btn-danger btn-large" onClick={() => handleRecordResult("incorrect")}>
+                I got it wrong →
+              </button>
+            </div>
           </div>
         )}
       </div>

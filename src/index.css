@@ -17,6 +17,8 @@
   --color-text: #1f2937;
   --color-text-light: #6b7280;
   --color-accent: #10b981;
+  --color-danger: #ef4444;
+  --color-danger-hover: #dc2626;
   --color-reveal: #f59e0b;
   --color-reveal-hover: #d97706;
   --color-active: #059669;
@@ -95,6 +97,17 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
+.btn-success {
+  background: var(--color-accent);
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+.btn-success:hover {
+  background: var(--color-active);
+  box-shadow: var(--shadow-lg);
+}
+
 .btn-secondary {
   background: var(--color-secondary);
   color: white;
@@ -103,6 +116,17 @@ body {
 
 .btn-secondary:hover {
   background: var(--color-secondary-hover);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+.btn-danger:hover {
+  background: var(--color-danger-hover);
+  box-shadow: var(--shadow-lg);
 }
 
 .btn-huge {
@@ -362,6 +386,19 @@ body {
   color: var(--color-text);
   text-align: left;
   overflow-wrap: anywhere;
+}
+
+.outcome-prompt {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-light);
+}
+
+.outcome-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 /* Settings */

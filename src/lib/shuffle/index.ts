@@ -1,5 +1,7 @@
 // Fisher-Yates shuffle and queue management
 
+import type { WordResults } from "../storage";
+
 export function shuffle<T>(array: T[]): T[] {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -15,15 +17,18 @@ export interface WordQueue {
 }
 
 /**
- * Build a queue of words prioritizing unattempted words.
- * If all words have been attempted, shuffle all words.
+ * Build a queue that prioritizes words marked incorrect, then unseen words.
+ * If every word is already marked correct, shuffle all words.
  */
-export function buildQueue(allWords: string[], attempted: Set<string>): WordQueue {
-  const unattempted = allWords.filter((w) => !attempted.has(w));
-  if (unattempted.length > 0) {
-    return { queue: shuffle(unattempted), index: 0 };
+export function buildQueue(allWords: string[], results: WordResults): WordQueue {
+  const incorrect = allWords.filter((word) => results[word] === "incorrect");
+  const unseen = allWords.filter((word) => !results[word]);
+
+  if (incorrect.length > 0 || unseen.length > 0) {
+    return { queue: [...shuffle(incorrect), ...shuffle(unseen)], index: 0 };
   }
-  // All words attempted — reshuffle everything
+
+  // All words are already marked correct — reshuffle everything.
   return { queue: shuffle(allWords), index: 0 };
 }
 
@@ -34,11 +39,10 @@ export function buildQueue(allWords: string[], attempted: Set<string>): WordQueu
 export function nextWord(
   wordQueue: WordQueue,
   allWords: string[],
-  attempted: Set<string>
+  results: WordResults
 ): { word: string; updatedQueue: WordQueue } {
   if (wordQueue.index >= wordQueue.queue.length) {
-    // Rebuild queue
-    const newQueue = buildQueue(allWords, attempted);
+    const newQueue = buildQueue(allWords, results);
     return {
       word: newQueue.queue[0],
       updatedQueue: { ...newQueue, index: 1 },
