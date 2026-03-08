@@ -1,4 +1,10 @@
-import type { DigitCount, MultiplicationProblem, MultiplicationSelection } from "../types";
+import type {
+  DigitCount,
+  DivisionProblem,
+  DivisionSelection,
+  MultiplicationProblem,
+  MultiplicationSelection,
+} from "../types";
 
 function getBoundsForDigits(digits: DigitCount): { min: number; max: number } {
   if (digits === 1) {
@@ -31,4 +37,22 @@ export function generateMultiplicationProblem(
 
 export function getMultiplicationLabel(selection: MultiplicationSelection): string {
   return `${selection.leftDigits}-digit x ${selection.rightDigits}-digit`;
+}
+
+export function generateDivisionProblem(selection: DivisionSelection): DivisionProblem {
+  const denominatorBounds = getBoundsForDigits(selection.denominatorDigits);
+  const answerBounds = getBoundsForDigits(selection.answerDigits);
+  const denominator = randomInt(denominatorBounds.min, denominatorBounds.max);
+  const answer = randomInt(answerBounds.min, answerBounds.max);
+
+  return {
+    ...selection,
+    denominator,
+    dividend: denominator * answer,
+    answer,
+  };
+}
+
+export function getDivisionLabel(selection: DivisionSelection): string {
+  return `${selection.denominatorDigits}-digit denominator • ${selection.answerDigits}-digit answer`;
 }

@@ -1,24 +1,55 @@
 import { useCallback, useState } from "react";
-import type { MultiplicationProblem, MultiplicationSelection } from "../../types";
-import { generateMultiplicationProblem, getMultiplicationLabel } from "../../lib/math";
+import type {
+  DivisionProblem,
+  DivisionSelection,
+  MultiplicationProblem,
+  MultiplicationSelection,
+} from "../../types";
+import {
+  generateDivisionProblem,
+  generateMultiplicationProblem,
+  getDivisionLabel,
+  getMultiplicationLabel,
+} from "../../lib/math";
 
-interface MathPracticeProps {
-  selection: MultiplicationSelection;
-  onBack: () => void;
-}
+type MathPracticeProps =
+  | {
+      mode: "multiplication";
+      selection: MultiplicationSelection;
+      onBack: () => void;
+    }
+  | {
+      mode: "division";
+      selection: DivisionSelection;
+      onBack: () => void;
+    };
 
-export default function MathPractice({ selection, onBack }: MathPracticeProps) {
-  const [problem, setProblem] = useState<MultiplicationProblem>(() =>
-    generateMultiplicationProblem(selection)
+export default function MathPractice({ mode, selection, onBack }: MathPracticeProps) {
+  const [problem, setProblem] = useState<MultiplicationProblem | DivisionProblem>(() =>
+    mode === "multiplication"
+      ? generateMultiplicationProblem(selection)
+      : generateDivisionProblem(selection)
   );
   const [revealed, setRevealed] = useState(false);
   const [problemCount, setProblemCount] = useState(1);
 
   const loadNextProblem = useCallback(() => {
-    setProblem(generateMultiplicationProblem(selection));
+    setProblem(
+      mode === "multiplication"
+        ? generateMultiplicationProblem(selection)
+        : generateDivisionProblem(selection)
+    );
     setRevealed(false);
     setProblemCount((count) => count + 1);
-  }, [selection]);
+  }, [mode, selection]);
+
+  const heading = mode === "multiplication" ? "Multiplication" : "Whole Number Division";
+  const subtitle =
+    mode === "multiplication" ? getMultiplicationLabel(selection) : getDivisionLabel(selection);
+  const problemText =
+    mode === "multiplication"
+      ? `${(problem as MultiplicationProblem).left} x ${(problem as MultiplicationProblem).right}`
+      : `${(problem as DivisionProblem).dividend} ÷ ${(problem as DivisionProblem).denominator}`;
 
   return (
     <div className="screen practice">
@@ -27,8 +58,8 @@ export default function MathPractice({ selection, onBack }: MathPracticeProps) {
           ← Back
         </button>
         <div className="practice-info">
-          <h2>Multiplication</h2>
-          <p className="practice-subtitle">{getMultiplicationLabel(selection)}</p>
+          <h2>{heading}</h2>
+          <p className="practice-subtitle">{subtitle}</p>
           <p className="progress-text-small">Problem {problemCount}</p>
         </div>
       </div>
@@ -38,9 +69,7 @@ export default function MathPractice({ selection, onBack }: MathPracticeProps) {
           <>
             <div className="math-problem-card">
               <p className="math-problem-label">Solve this problem</p>
-              <div className="revealed-word math-problem">
-                {problem.left} x {problem.right}
-              </div>
+              <div className="revealed-word math-problem">{problemText}</div>
             </div>
             <div className="practice-reveal">
               <button className="btn btn-reveal" onClick={() => setRevealed(true)}>
@@ -50,9 +79,7 @@ export default function MathPractice({ selection, onBack }: MathPracticeProps) {
           </>
         ) : (
           <div className="practice-revealed">
-            <div className="math-problem-summary">
-              {problem.left} x {problem.right}
-            </div>
+            <div className="math-problem-summary">{problemText}</div>
             <div className="revealed-word">{problem.answer}</div>
             <button className="btn btn-primary btn-huge" onClick={loadNextProblem}>
               Next Problem →
