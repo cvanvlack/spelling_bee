@@ -24,6 +24,7 @@ export type Screen =
   | "settings"
   | "math-categories"
   | "math-multiplication"
+  | "math-fractions"
   | "math-division"
   | "math-practice";
 
@@ -39,6 +40,20 @@ export interface DivisionSelection {
   answerDigits: DigitCount;
 }
 
+export type FractionOperation = "addition" | "subtraction" | "multiplication" | "division";
+
+export type FractionDifficulty = "easy" | "medium" | "hard";
+
+export interface FractionSelection {
+  operation: FractionOperation;
+  difficulty: FractionDifficulty;
+}
+
+export interface FractionValue {
+  numerator: number;
+  denominator: number;
+}
+
 export interface MultiplicationProblem extends MultiplicationSelection {
   left: number;
   right: number;
@@ -49,4 +64,10 @@ export interface DivisionProblem extends DivisionSelection {
   dividend: number;
   denominator: number;
   answer: number;
+}
+
+export interface FractionProblem extends FractionSelection {
+  left: FractionValue;
+  right: FractionValue;
+  answer: string;
 }
