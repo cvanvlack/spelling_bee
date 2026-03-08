@@ -1,10 +1,11 @@
 import { useState } from "react";
-import type { Level, MultiplicationSelection, Screen } from "./types";
+import type { DivisionSelection, Level, MultiplicationSelection, Screen } from "./types";
 import LevelSelect from "./features/levels/LevelSelect";
 import Practice from "./features/practice/Practice";
 import Settings from "./features/settings/Settings";
 import MathCategorySelect from "./features/math/MathCategorySelect";
 import MultiplicationSelect from "./features/math/MultiplicationSelect";
+import DivisionSelect from "./features/math/DivisionSelect";
 import MathPractice from "./features/math/MathPractice";
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
   const [selectedMultiplication, setSelectedMultiplication] =
     useState<MultiplicationSelection | null>(null);
+  const [selectedDivision, setSelectedDivision] = useState<DivisionSelection | null>(null);
 
   const handleSelectLevel = (level: Level) => {
     setSelectedLevel(level);
@@ -20,6 +22,13 @@ function App() {
 
   const handleSelectMultiplication = (selection: MultiplicationSelection) => {
     setSelectedMultiplication(selection);
+    setSelectedDivision(null);
+    setScreen("math-practice");
+  };
+
+  const handleSelectDivision = (selection: DivisionSelection) => {
+    setSelectedDivision(selection);
+    setSelectedMultiplication(null);
     setScreen("math-practice");
   };
 
@@ -29,7 +38,7 @@ function App() {
         <div className="screen home">
           <div className="home-content">
             <h1 className="app-title">Spelling & Math Trainer</h1>
-            <p className="app-subtitle">Build spelling and multiplication fluency</p>
+            <p className="app-subtitle">Build spelling, multiplication, and division fluency</p>
             <div className="home-buttons">
               <button
                 className="btn btn-primary btn-huge"
@@ -71,6 +80,7 @@ function App() {
       {screen === "math-categories" && (
         <MathCategorySelect
           onSelectMultiplication={() => setScreen("math-multiplication")}
+          onSelectDivision={() => setScreen("math-division")}
           onBack={() => setScreen("home")}
         />
       )}
@@ -82,11 +92,28 @@ function App() {
         />
       )}
 
+      {screen === "math-division" && (
+        <DivisionSelect
+          onSelect={handleSelectDivision}
+          onBack={() => setScreen("math-categories")}
+        />
+      )}
+
       {screen === "math-practice" && selectedMultiplication && (
         <MathPractice
           key={`${selectedMultiplication.leftDigits}-${selectedMultiplication.rightDigits}`}
+          mode="multiplication"
           selection={selectedMultiplication}
           onBack={() => setScreen("math-multiplication")}
+        />
+      )}
+
+      {screen === "math-practice" && selectedDivision && (
+        <MathPractice
+          key={`${selectedDivision.denominatorDigits}-${selectedDivision.answerDigits}`}
+          mode="division"
+          selection={selectedDivision}
+          onBack={() => setScreen("math-division")}
         />
       )}
 

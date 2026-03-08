@@ -24,6 +24,7 @@ export type Screen =
   | "settings"
   | "math-categories"
   | "math-multiplication"
+  | "math-division"
   | "math-practice";
 
 export type DigitCount = 1 | 2 | 3;
@@ -33,8 +34,19 @@ export interface MultiplicationSelection {
   rightDigits: DigitCount;
 }
 
+export interface DivisionSelection {
+  denominatorDigits: DigitCount;
+  answerDigits: DigitCount;
+}
+
 export interface MultiplicationProblem extends MultiplicationSelection {
   left: number;
   right: number;
+  answer: number;
+}
+
+export interface DivisionProblem extends DivisionSelection {
+  dividend: number;
+  denominator: number;
   answer: number;
 }
