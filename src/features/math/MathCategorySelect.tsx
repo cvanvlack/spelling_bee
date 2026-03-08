@@ -1,11 +1,13 @@
 interface MathCategorySelectProps {
   onSelectMultiplication: () => void;
+  onSelectFractions: () => void;
   onSelectDivision: () => void;
   onBack: () => void;
 }
 
 export default function MathCategorySelect({
   onSelectMultiplication,
+  onSelectFractions,
   onSelectDivision,
   onBack,
 }: MathCategorySelectProps) {
@@ -23,9 +25,19 @@ export default function MathCategorySelect({
             problems.
           </p>
         </button>
-        <button className="level-card math-category-card" onClick={onSelectDivision}>
+        <button className="level-card math-category-card" onClick={onSelectFractions}>
           <div className="level-card-header">
             <span className="level-number">Category 2</span>
+            <span className="level-name">Fractions</span>
+          </div>
+          <p className="math-card-description">
+            Practice adding, subtracting, multiplying, and dividing fractions with simplified
+            final answers.
+          </p>
+        </button>
+        <button className="level-card math-category-card" onClick={onSelectDivision}>
+          <div className="level-card-header">
+            <span className="level-number">Category 3</span>
             <span className="level-name">Whole Number Division</span>
           </div>
           <p className="math-card-description">

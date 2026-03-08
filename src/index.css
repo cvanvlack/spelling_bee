@@ -292,6 +292,34 @@ body {
   gap: 12px;
 }
 
+.fraction-section-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.fraction-section-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fraction-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fraction-difficulty-grid {
+  flex: none;
+}
+
+.fraction-difficulty-card {
+  padding: 16px;
+}
+
 .math-option-title {
   font-size: 1.1rem;
   font-weight: 700;
