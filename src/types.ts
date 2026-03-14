@@ -22,6 +22,7 @@ export type Screen =
   | "levels"
   | "practice"
   | "settings"
+  | "geo-search"
   | "math-categories"
   | "math-multiplication"
   | "math-division"
