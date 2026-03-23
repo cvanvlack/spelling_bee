@@ -1,11 +1,18 @@
 import { useState } from "react";
-import type { DivisionSelection, Level, MultiplicationSelection, Screen } from "./types";
+import type {
+  DivisionSelection,
+  FractionSelection,
+  Level,
+  MultiplicationSelection,
+  Screen,
+} from "./types";
 import LevelSelect from "./features/levels/LevelSelect";
 import Practice from "./features/practice/Practice";
 import Settings from "./features/settings/Settings";
 import MathCategorySelect from "./features/math/MathCategorySelect";
 import MultiplicationSelect from "./features/math/MultiplicationSelect";
 import DivisionSelect from "./features/math/DivisionSelect";
+import FractionSelect from "./features/math/FractionSelect";
 import MathPractice from "./features/math/MathPractice";
 
 function App() {
@@ -14,6 +21,7 @@ function App() {
   const [selectedMultiplication, setSelectedMultiplication] =
     useState<MultiplicationSelection | null>(null);
   const [selectedDivision, setSelectedDivision] = useState<DivisionSelection | null>(null);
+  const [selectedFraction, setSelectedFraction] = useState<FractionSelection | null>(null);
 
   const handleSelectLevel = (level: Level) => {
     setSelectedLevel(level);
@@ -23,12 +31,21 @@ function App() {
   const handleSelectMultiplication = (selection: MultiplicationSelection) => {
     setSelectedMultiplication(selection);
     setSelectedDivision(null);
+    setSelectedFraction(null);
     setScreen("math-practice");
   };
 
   const handleSelectDivision = (selection: DivisionSelection) => {
     setSelectedDivision(selection);
     setSelectedMultiplication(null);
+    setSelectedFraction(null);
+    setScreen("math-practice");
+  };
+
+  const handleSelectFraction = (selection: FractionSelection) => {
+    setSelectedFraction(selection);
+    setSelectedMultiplication(null);
+    setSelectedDivision(null);
     setScreen("math-practice");
   };
 
@@ -38,7 +55,9 @@ function App() {
         <div className="screen home">
           <div className="home-content">
             <h1 className="app-title">Spelling & Math Trainer</h1>
-            <p className="app-subtitle">Build spelling, multiplication, and division fluency</p>
+            <p className="app-subtitle">
+              Build spelling, multiplication, division, and fractions fluency
+            </p>
             <div className="home-buttons">
               <button
                 className="btn btn-primary btn-huge"
@@ -80,6 +99,7 @@ function App() {
       {screen === "math-categories" && (
         <MathCategorySelect
           onSelectMultiplication={() => setScreen("math-multiplication")}
+          onSelectFractions={() => setScreen("math-fractions")}
           onSelectDivision={() => setScreen("math-division")}
           onBack={() => setScreen("home")}
         />
@@ -99,6 +119,13 @@ function App() {
         />
       )}
 
+      {screen === "math-fractions" && (
+        <FractionSelect
+          onSelect={handleSelectFraction}
+          onBack={() => setScreen("math-categories")}
+        />
+      )}
+
       {screen === "math-practice" && selectedMultiplication && (
         <MathPractice
           key={`${selectedMultiplication.leftDigits}-${selectedMultiplication.rightDigits}`}
@@ -114,6 +141,15 @@ function App() {
           mode="division"
           selection={selectedDivision}
           onBack={() => setScreen("math-division")}
+        />
+      )}
+
+      {screen === "math-practice" && selectedFraction && (
+        <MathPractice
+          key={`${selectedFraction.operation}-${selectedFraction.difficulty}`}
+          mode="fractions"
+          selection={selectedFraction}
+          onBack={() => setScreen("math-fractions")}
         />
       )}
 
