@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { Level } from "../../types";
 import { loadWordLists } from "../../lib/data";
 import { getProgress } from "../../lib/storage";
+import ScreenHeader from "../../components/ScreenHeader";
 
 interface LevelSelectProps {
   onSelectLevel: (level: Level) => void;
@@ -33,7 +34,7 @@ export default function LevelSelect({ onSelectLevel, onBack }: LevelSelectProps)
 
   return (
     <div className="screen level-select">
-      <h1>Choose a Level</h1>
+      <ScreenHeader title="Choose a Level" onBack={onBack} />
       <div className="level-list">
         {levels.map((level, i) => {
           const progress = getProgress(level.id, level.words.length);
@@ -63,9 +64,6 @@ export default function LevelSelect({ onSelectLevel, onBack }: LevelSelectProps)
           );
         })}
       </div>
-      <button className="btn btn-secondary back-btn" onClick={onBack}>
-        Back
-      </button>
     </div>
   );
 }

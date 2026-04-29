@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getAvailableEngines, listVoices, speak } from "../../lib/tts";
 import { getSettings, saveSettings } from "../../lib/storage";
 import type { TtsEngineId, TtsVoiceOption } from "../../lib/tts";
+import ScreenHeader from "../../components/ScreenHeader";
 
 function getInitialSettings() {
   return getSettings();
@@ -88,7 +89,7 @@ export default function Settings({ onBack }: SettingsProps) {
 
   return (
     <div className="screen settings">
-      <h1>Settings</h1>
+      <ScreenHeader title="Settings" onBack={onBack} />
 
       <div className="settings-group">
         <label className="settings-label">TTS Engine</label>
@@ -159,9 +160,6 @@ export default function Settings({ onBack }: SettingsProps) {
         />
       </div>
 
-      <button className="btn btn-secondary back-btn" onClick={onBack}>
-        Back
-      </button>
     </div>
   );
 }

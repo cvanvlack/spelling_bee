@@ -1,3 +1,5 @@
+import ScreenHeader from "../../components/ScreenHeader";
+
 interface MathCategorySelectProps {
   onSelectMultiplication: () => void;
   onSelectFractions: () => void;
@@ -13,7 +15,7 @@ export default function MathCategorySelect({
 }: MathCategorySelectProps) {
   return (
     <div className="screen level-select">
-      <h1>Choose a Math Category</h1>
+      <ScreenHeader title="Choose a Math Category" onBack={onBack} />
       <div className="level-list">
         <button className="level-card math-category-card" onClick={onSelectMultiplication}>
           <div className="level-card-header">
@@ -46,9 +48,6 @@ export default function MathCategorySelect({
           </p>
         </button>
       </div>
-      <button className="btn btn-secondary back-btn" onClick={onBack}>
-        Back
-      </button>
     </div>
   );
 }
