@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type {
+  FractionOperation,
   DivisionSelection,
   FractionSelection,
   Level,
@@ -13,6 +14,7 @@ import MathCategorySelect from "./features/math/MathCategorySelect";
 import MultiplicationSelect from "./features/math/MultiplicationSelect";
 import DivisionSelect from "./features/math/DivisionSelect";
 import FractionSelect from "./features/math/FractionSelect";
+import FractionDifficultySelect from "./features/math/FractionDifficultySelect";
 import MathPractice from "./features/math/MathPractice";
 
 function App() {
@@ -22,6 +24,7 @@ function App() {
     useState<MultiplicationSelection | null>(null);
   const [selectedDivision, setSelectedDivision] = useState<DivisionSelection | null>(null);
   const [selectedFraction, setSelectedFraction] = useState<FractionSelection | null>(null);
+  const [selectedFractionOperation, setSelectedFractionOperation] = useState<FractionOperation | null>(null);
 
   const handleSelectLevel = (level: Level) => {
     setSelectedLevel(level);
@@ -42,12 +45,33 @@ function App() {
     setScreen("math-practice");
   };
 
+  const handleSelectFractionOperation = (operation: FractionOperation) => {
+    setSelectedFractionOperation(operation);
+    setSelectedFraction(null);
+    setSelectedMultiplication(null);
+    setSelectedDivision(null);
+    setScreen("math-fraction-difficulty");
+  };
+
   const handleSelectFraction = (selection: FractionSelection) => {
     setSelectedFraction(selection);
+    setSelectedFractionOperation(selection.operation);
     setSelectedMultiplication(null);
     setSelectedDivision(null);
     setScreen("math-practice");
   };
+
+  const fractionPracticeBackScreen = useMemo<Screen>(() => {
+    if (selectedMultiplication) {
+      return "math-multiplication";
+    }
+
+    if (selectedDivision) {
+      return "math-division";
+    }
+
+    return "math-fraction-difficulty";
+  }, [selectedDivision, selectedMultiplication]);
 
   return (
     <div className="app">
@@ -121,8 +145,18 @@ function App() {
 
       {screen === "math-fractions" && (
         <FractionSelect
-          onSelect={handleSelectFraction}
+          onSelect={handleSelectFractionOperation}
           onBack={() => setScreen("math-categories")}
+        />
+      )}
+
+      {screen === "math-fraction-difficulty" && selectedFractionOperation && (
+        <FractionDifficultySelect
+          operation={selectedFractionOperation}
+          onSelect={(difficulty) =>
+            handleSelectFraction({ operation: selectedFractionOperation, difficulty })
+          }
+          onBack={() => setScreen("math-fractions")}
         />
       )}
 
@@ -149,7 +183,7 @@ function App() {
           key={`${selectedFraction.operation}-${selectedFraction.difficulty}`}
           mode="fractions"
           selection={selectedFraction}
-          onBack={() => setScreen("math-fractions")}
+          onBack={() => setScreen(fractionPracticeBackScreen)}
         />
       )}
 

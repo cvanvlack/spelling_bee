@@ -25,6 +25,7 @@ export type Screen =
   | "math-categories"
   | "math-multiplication"
   | "math-fractions"
+  | "math-fraction-difficulty"
   | "math-division"
   | "math-practice";
 

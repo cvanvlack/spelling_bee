@@ -1,4 +1,5 @@
 import type { DigitCount, MultiplicationSelection } from "../../types";
+import ScreenHeader from "../../components/ScreenHeader";
 
 interface MultiplicationSelectProps {
   onSelect: (selection: MultiplicationSelection) => void;
@@ -13,7 +14,7 @@ export default function MultiplicationSelect({
 }: MultiplicationSelectProps) {
   return (
     <div className="screen level-select">
-      <h1>Choose Multiplication Digits</h1>
+      <ScreenHeader title="Choose Multiplication Digits" onBack={onBack} />
       <div className="math-option-grid">
         {DIGIT_OPTIONS.flatMap((leftDigits) =>
           DIGIT_OPTIONS.map((rightDigits) => (
@@ -32,9 +33,6 @@ export default function MultiplicationSelect({
           ))
         )}
       </div>
-      <button className="btn btn-secondary back-btn" onClick={onBack}>
-        Back
-      </button>
     </div>
   );
 }

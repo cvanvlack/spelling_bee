@@ -1,3 +1,4 @@
+import ScreenHeader from "../../components/ScreenHeader";
 import type { DigitCount, DivisionSelection } from "../../types";
 
 interface DivisionSelectProps {
@@ -10,7 +11,7 @@ const DIGIT_OPTIONS: DigitCount[] = [1, 2, 3];
 export default function DivisionSelect({ onSelect, onBack }: DivisionSelectProps) {
   return (
     <div className="screen level-select">
-      <h1>Choose Division Digits</h1>
+      <ScreenHeader title="Choose Division Digits" onBack={onBack} />
       <div className="math-option-grid">
         {DIGIT_OPTIONS.flatMap((denominatorDigits) =>
           DIGIT_OPTIONS.map((answerDigits) => (
@@ -30,9 +31,6 @@ export default function DivisionSelect({ onSelect, onBack }: DivisionSelectProps
           ))
         )}
       </div>
-      <button className="btn btn-secondary back-btn" onClick={onBack}>
-        Back
-      </button>
     </div>
   );
 }
