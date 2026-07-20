@@ -112,7 +112,6 @@ def main() -> None:
         baseline,
         trainset=trainset,
         valset=valset or None,
-        requires_permission_to_run=False,
     )
 
     print("Scoring optimized on preview set...")

@@ -11,6 +11,7 @@ dependencies = [
     "dspy>=2.6.0",
     # litellm >=1.92 ships platform wheels only (no macOS); pin pure-python wheels. Required as a dependency for dspy
     "litellm>=1.64.0,<=1.91.4",
+    "optuna>=4.9.0",
     "pydantic>=2.10.0",
     "pydantic-settings>=2.7.0",
     "python-dotenv>=1.0.0",
