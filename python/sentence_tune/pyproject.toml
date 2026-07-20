@@ -56,5 +56,9 @@ typeCheckingMode = "strict"
 pythonVersion = "3.12"
 include = ["sentence_tune", "scripts"]
 reportMissingTypeStubs = false
+# dspy ships no type annotations, so every attribute access on it is "Unknown".
+# Silencing this one rule beats sprinkling inline ignores through the code.
+reportUnknownMemberType = false
+reportUnusedCallResult = false
 venvPath = "."
 venv = ".venv"
