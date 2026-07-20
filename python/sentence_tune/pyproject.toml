@@ -1,0 +1,60 @@
+[project]
+name = "sentence-tune"
+version = "0.1.0"
+description = "DSPy + OpenRouter toolkit to generate kid-friendly spelling-bee example sentences"
+readme = "README.md"
+authors = [
+    { name = "Cole Van Vlack", email = "cvanvlack@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "dspy>=2.6.0",
+    # litellm >=1.92 ships platform wheels only (no macOS); pin pure-python wheels. Required as a dependency for dspy
+    "litellm>=1.64.0,<=1.91.4",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.7.0",
+    "python-dotenv>=1.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.23.0",
+    "ruff>=0.9.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["sentence_tune"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["sentence_tune", "scripts"]
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "UP",
+    "B",
+    "SIM",
+    "RUF",
+    "PTH",
+    "TC",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.basedpyright]
+typeCheckingMode = "strict"
+pythonVersion = "3.12"
+include = ["sentence_tune", "scripts"]
+reportMissingTypeStubs = false
+venvPath = "."
+venv = ".venv"

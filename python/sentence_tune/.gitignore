@@ -1,0 +1,13 @@
+.venv/
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+dist/
+build/
+sentence_tune/artifacts/.sentence-cache.json
+sentence_tune/artifacts/optimized_sentence_generator.json
+!sentence_tune/artifacts/.gitkeep
