@@ -34,10 +34,9 @@ def judge_sentence(
     judge: SentenceJudge,
     *,
     word: str,
-    definition: str,
     sentence: str,
 ) -> JudgeResult:
-    pred = judge(word=word, definition=definition, sentence=sentence)
+    pred = judge(word=word, sentence=sentence)
     return parse_judge_prediction(pred)
 
 
@@ -46,12 +45,10 @@ def make_metric(judge: SentenceJudge) -> Callable[[dspy.Example, dspy.Prediction
 
     def metric(example: dspy.Example, pred: dspy.Prediction, _trace: object | None = None) -> float:
         word = example_field(example, "word")
-        definition = example_field(example, "definition")
         sentence = str(getattr(pred, "sentence", "") or "")
         return judge_sentence(
             judge,
             word=word,
-            definition=definition,
             sentence=sentence,
         ).score
 

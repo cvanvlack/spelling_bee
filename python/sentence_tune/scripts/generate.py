@@ -16,7 +16,7 @@ from sentence_tune.data import (
     load_wordlists,
     save_cache,
     save_wordlists,
-    words_with_definitions,
+    unique_words,
 )
 from sentence_tune.lm import configure_dspy
 from sentence_tune.models import (
@@ -87,7 +87,7 @@ def main() -> None:
 
     data = load_wordlists(args.input)
     pairs = iter_words(data, level_id=args.level, limit=args.limit)
-    targets = words_with_definitions(pairs)
+    targets = unique_words(pairs)
 
     if args.reset_cache and args.cache.exists():
         args.cache.unlink()
@@ -95,7 +95,7 @@ def main() -> None:
 
     print(f"Input:  {args.input}")
     print(f"Output: {output}")
-    print(f"Words with definitions in scope: {len(targets)}")
+    print(f"Words in scope: {len(targets)}")
     print(f"Cache entries: {len(cache.entries)}")
 
     if args.dry_run:

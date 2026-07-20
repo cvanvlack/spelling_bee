@@ -61,8 +61,8 @@ def iter_words(
     return out
 
 
-def words_with_definitions(pairs: Iterable[tuple[str, WordEntry]]) -> list[WordEntry]:
-    """Unique words that have a non-empty definition (needed for generation)."""
+def unique_words(pairs: Iterable[tuple[str, WordEntry]]) -> list[WordEntry]:
+    """Deduplicate words by casefold (order preserved)."""
     seen: set[str] = set()
     result: list[WordEntry] = []
     for _, word in pairs:
@@ -80,15 +80,14 @@ def stratified_sample(
     n: int,
     seed: int = 42,
 ) -> list[WordEntry]:
-    """Sample up to `n` words evenly across levels (definitions required)."""
+    """Sample up to `n` words evenly across levels."""
     rng = random.Random(seed)
     by_level: list[list[WordEntry]] = []
     for level in data.levels:
-        eligible = [w for w in level.words if w.definition and w.definition.strip()]
         # Deduplicate within level by casefold.
         seen: set[str] = set()
         unique: list[WordEntry] = []
-        for w in eligible:
+        for w in level.words:
             key = w.text.casefold()
             if key not in seen:
                 seen.add(key)
@@ -120,8 +119,7 @@ def to_examples(words: list[WordEntry]) -> list[dspy.Example]:
     """Convert word entries to DSPy examples (inputs only)."""
     examples: list[dspy.Example] = []
     for word in words:
-        definition = word.definition or ""
-        ex = dspy.Example(word=word.text, definition=definition).with_inputs("word", "definition")
+        ex = dspy.Example(word=word.text).with_inputs("word")
         examples.append(ex)
     return examples
 

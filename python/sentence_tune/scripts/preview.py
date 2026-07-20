@@ -45,7 +45,7 @@ def main() -> None:
         if level is None:
             print(f"Unknown level: {args.level}", file=sys.stderr)
             sys.exit(1)
-        words = [w for w in level.words if w.definition][: args.limit]
+        words = level.words[: args.limit]
     else:
         words = stratified_sample(data, n=args.limit, seed=args.seed)
 
@@ -66,13 +66,11 @@ def main() -> None:
     print(f"{'word':<16} {'score':>5}  old -> new")
     print("-" * 100)
     for word in words:
-        definition = word.definition or ""
-        pred = program(word=word.text, definition=definition)
+        pred = program(word=word.text)
         new_sentence = str(getattr(pred, "sentence", "") or "").strip()
         result = judge_sentence(
             judge,
             word=word.text,
-            definition=definition,
             sentence=new_sentence,
         )
         old = (word.sentence or "").replace("\n", " ")

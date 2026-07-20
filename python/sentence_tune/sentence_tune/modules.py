@@ -14,8 +14,8 @@ class SentenceGenerator(dspy.Module):
         super().__init__()
         self.generate = dspy.Predict(GenerateSentence)
 
-    def forward(self, word: str, definition: str) -> dspy.Prediction:
-        return self.generate(word=word, definition=definition)
+    def forward(self, word: str) -> dspy.Prediction:
+        return self.generate(word=word)
 
 
 class SentenceJudge(dspy.Module):
@@ -25,5 +25,5 @@ class SentenceJudge(dspy.Module):
         super().__init__()
         self.judge = dspy.Predict(JudgeSentence)
 
-    def forward(self, word: str, definition: str, sentence: str) -> dspy.Prediction:
-        return self.judge(word=word, definition=definition, sentence=sentence)
+    def forward(self, word: str, sentence: str) -> dspy.Prediction:
+        return self.judge(word=word, sentence=sentence)

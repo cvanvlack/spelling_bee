@@ -60,10 +60,7 @@ def eval_mean(
         return 0.0
     scores: list[float] = []
     for ex in examples:
-        pred = program(
-            word=example_field(ex, "word"),
-            definition=example_field(ex, "definition"),
-        )
+        pred = program(word=example_field(ex, "word"))
         scores.append(metric(ex, pred))
     return sum(scores) / len(scores)
 
@@ -83,7 +80,7 @@ def main() -> None:
         seed=args.seed,
     )
     if len(sample) < 10:
-        print(f"Need more words with definitions; got {len(sample)}", file=sys.stderr)
+        print(f"Need more words for training; got {len(sample)}", file=sys.stderr)
         sys.exit(1)
 
     train_words = sample[: args.train_size]
