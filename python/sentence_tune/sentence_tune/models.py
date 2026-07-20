@@ -5,24 +5,32 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Annotated
 
-from pydantic import BaseModel, Field, SecretStr
+from pydantic import BaseModel, ConfigDict, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 Score = Annotated[float, Field(ge=0.0, le=1.0)]
 
 
 class WordEntry(BaseModel):
+    # Preserve unknown fields so they round-trip through load/save untouched.
+    model_config = ConfigDict(extra="allow")
+
     text: str
+    definition: str | None = None
     sentence: str | None = None
 
 
 class Level(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
     id: str
     name: str
     words: list[WordEntry]
 
 
 class WordlistsFile(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
     version: int
     levels: list[Level]
 
